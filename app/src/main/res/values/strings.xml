@@ -1,4 +1,33 @@
 <resources>
     <string name="app_name">InstagramClone</string>
     <string name="hello">Merhaba 👋</string>
+
+    <!-- Ortak (birden fazla ekranda kullanılanlar) -->
+    <string name="app_logo">Instagram</string>
+    <string name="hint_email">E-posta</string>
+    <string name="hint_password">Şifre</string>
+
+    <!-- Login ekranı -->
+    <string name="login_button">Giriş Yap</string>
+    <string name="login_no_account">Hesabın yok mu?</string>
+    <string name="login_register_link">Kayıt ol</string>
+    <string name="login_form_ok">Form geçerli, backend henüz bağlı değil</string>
+
+    <!-- Kayıt ekranı -->
+    <string name="register_username_hint">Kullanıcı adı</string>
+    <string name="register_confirm_password_hint">Şifre tekrar</string>
+    <string name="register_button">Kayıt Ol</string>
+    <string name="register_have_account">Zaten hesabın var mı?</string>
+    <string name="register_login_link">Giriş yap</string>
+    <string name="register_form_ok">Kayıt formu geçerli, backend henüz bağlı değil</string>
+
+    <!-- Doğrulama hataları -->
+    <string name="error_username_empty">Kullanıcı adı boş olamaz</string>
+    <string name="error_username_short">Kullanıcı adı en az 3 karakter olmalı</string>
+    <string name="error_email_empty">E-posta boş olamaz</string>
+    <string name="error_email_invalid">Geçerli bir e-posta gir</string>
+    <string name="error_password_empty">Şifre boş olamaz</string>
+    <string name="error_password_short">Şifre en az 6 karakter olmalı</string>
+    <string name="error_confirm_password_empty">Şifreyi tekrar gir</string>
+    <string name="error_password_mismatch">Şifreler eşleşmiyor</string>
 </resources>
