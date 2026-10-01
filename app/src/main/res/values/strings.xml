@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">InstagramClone</string>
-    <string name="hello">Merhaba 👋</string>
+
+    <!-- Alt menü sekmeleri -->
+    <string name="nav_home">Ana sayfa</string>
+    <string name="nav_explore">Keşfet</string>
+    <string name="nav_create">Oluştur</string>
+    <string name="nav_reels">Reels</string>
+    <string name="nav_profile">Profil</string>
 
     <!-- Ortak (birden fazla ekranda kullanılanlar) -->
     <string name="app_logo">Instagram</string>
@@ -11,7 +17,6 @@
     <string name="login_button">Giriş Yap</string>
     <string name="login_no_account">Hesabın yok mu?</string>
     <string name="login_register_link">Kayıt ol</string>
-    <string name="login_form_ok">Form geçerli, backend henüz bağlı değil</string>
 
     <!-- Kayıt ekranı -->
     <string name="register_username_hint">Kullanıcı adı</string>

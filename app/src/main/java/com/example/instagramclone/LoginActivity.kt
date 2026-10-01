@@ -3,7 +3,6 @@ package com.example.instagramclone
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -26,8 +25,10 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.loginButton.setOnClickListener {
+            // Geçici: şifre henüz kontrol edilmiyor, backend gelince gerçek girişe çevrilecek.
             if (validateForm()) {
-                Toast.makeText(this, R.string.login_form_ok, Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
             }
         }
 
