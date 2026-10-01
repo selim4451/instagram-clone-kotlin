@@ -1,5 +1,6 @@
 package com.example.instagramclone
 
+import com.example.instagramclone.db.DatabaseFactory
 import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -13,9 +14,24 @@ fun main() {
 }
 
 fun Application.module() {
+    DatabaseFactory.init()
+
     routing {
         get("/") {
             call.respondText("Hello")
+        }
+
+        // Geçici: veritabanı bağlantısını tarayıcıdan kontrol etmek için.
+        get("/db-check") {
+            val userCount = DatabaseFactory.dataSource.connection.use { connection ->
+                connection.prepareStatement("SELECT COUNT(*) FROM users").use { statement ->
+                    statement.executeQuery().use { result ->
+                        result.next()
+                        result.getLong(1)
+                    }
+                }
+            }
+            call.respondText("Veritabanı bağlı. Kullanıcı sayısı: $userCount")
         }
     }
 }
