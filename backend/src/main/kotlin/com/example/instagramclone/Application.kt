@@ -1,14 +1,19 @@
 package com.example.instagramclone
 
 import com.example.instagramclone.db.DatabaseFactory
-import com.example.instagramclone.models.ErrorResponse
+import com.example.instagramclone.dto.ErrorResponse
 import com.example.instagramclone.repositories.UserRepository
+import com.example.instagramclone.routes.JWT_AUTH
 import com.example.instagramclone.routes.authRoutes
 import com.example.instagramclone.services.AuthService
+import com.example.instagramclone.services.TokenService
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.BadRequestException
@@ -27,23 +32,36 @@ fun main() {
 
 fun Application.module() {
     DatabaseFactory.init()
-    val authService = AuthService(UserRepository(DatabaseFactory.dataSource))
+    val tokenService = TokenService(
+        System.getenv("JWT_SECRET") ?: error("JWT_SECRET environment variable is not set")
+    )
+    val authService = AuthService(UserRepository(DatabaseFactory.dataSource), tokenService)
 
     install(ContentNegotiation) {
         json()
+    }
+
+    install(Authentication) {
+        jwt(JWT_AUTH) {
+            verifier(tokenService.verifier)
+            validate { credential ->
+                if (credential.subject?.toLongOrNull() != null) JWTPrincipal(credential.payload) else null
+            }
+            challenge { _, _ ->
+                call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Oturum geçersiz ya da süresi dolmuş"))
+            }
+        }
     }
 
     install(StatusPages) {
         exception<ApiException> { call, cause ->
             call.respond(cause.status, ErrorResponse(cause.message ?: "Hata"))
         }
-        // Bozuk ya da eksik alanlı JSON gövdesi.
         exception<BadRequestException> { call, _ ->
             call.respond(HttpStatusCode.BadRequest, ErrorResponse("İstek gövdesi geçersiz"))
         }
-        // Beklenmeyen hatalar: ayrıntı loglanır, istemciye iç bilgi sızdırılmaz.
         exception<Throwable> { call, cause ->
-            call.application.environment.log.error("Beklenmeyen hata", cause)
+            call.application.environment.log.error("Unexpected error", cause)
             call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Sunucu hatası"))
         }
     }

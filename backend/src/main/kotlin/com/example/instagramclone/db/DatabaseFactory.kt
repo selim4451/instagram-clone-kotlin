@@ -13,9 +13,8 @@ object DatabaseFactory {
         val config = HikariConfig().apply {
             jdbcUrl = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/instagram_clone"
             username = System.getenv("DB_USER") ?: "postgres"
-            // Şifrenin varsayılanı yok: koda yazılmaz, ortam değişkeninden gelmek zorunda.
             password = System.getenv("DB_PASSWORD")
-                ?: error("DB_PASSWORD ortam değişkeni tanımlı değil")
+                ?: error("DB_PASSWORD environment variable is not set")
             maximumPoolSize = 5
         }
         dataSource = HikariDataSource(config)
@@ -23,7 +22,7 @@ object DatabaseFactory {
     }
 
     private fun createSchema() {
-        val sql = checkNotNull(javaClass.getResource("/schema.sql")) { "schema.sql bulunamadı" }.readText()
+        val sql = checkNotNull(javaClass.getResource("/schema.sql")) { "schema.sql not found" }.readText()
         dataSource.connection.use { connection ->
             connection.createStatement().use { it.execute(sql) }
         }

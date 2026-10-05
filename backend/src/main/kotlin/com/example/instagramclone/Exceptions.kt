@@ -8,3 +8,5 @@ open class ApiException(val status: HttpStatusCode, message: String) : RuntimeEx
 class ValidationException(message: String) : ApiException(HttpStatusCode.BadRequest, message)
 
 class ConflictException(message: String) : ApiException(HttpStatusCode.Conflict, message)
+
+class UnauthorizedException(message: String) : ApiException(HttpStatusCode.Unauthorized, message)
