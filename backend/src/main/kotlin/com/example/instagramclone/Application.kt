@@ -72,7 +72,6 @@ fun Application.module() {
             call.respondText("Hello")
         }
 
-        // resources/openapi/documentation.yaml dosyasını /swagger adresinde etkileşimli sayfa olarak gösterir.
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
 
         get("/db-check") {
