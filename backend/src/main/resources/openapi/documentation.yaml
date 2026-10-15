@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  title: Instagram Clone API
+  description: Backend for the Instagram clone Android app.
+  version: 0.0.1
+
+servers:
+  - url: /
+    description: The server this page is served from
+
+tags:
+  - name: Auth
+    description: Registration, login and the current session
+
+paths:
+  /register:
+    post:
+      tags: [Auth]
+      summary: Create a new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation failed or the request body is malformed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Şifre en az 6, en fazla 72 karakter olmalı
+        '409':
+          description: Username or email is already taken
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Bu kullanıcı adı zaten alınmış
+
+  /login:
+    post:
+      tags: [Auth]
+      summary: Log in and receive a JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: The request body is malformed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Wrong email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: E-posta veya şifre hatalı
+
+  /me:
+    get:
+      tags: [Auth]
+      summary: Get the logged-in user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: The user the token belongs to
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Token is missing, invalid or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Oturum geçersiz ya da süresi dolmuş
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+          description: 3-30 characters; lowercase letters, digits, dot and underscore
+          example: selim
+        email:
+          type: string
+          format: email
+          example: selim@example.com
+        password:
+          type: string
+          format: password
+          minLength: 6
+          maxLength: 72
+          example: '123456'
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: selim@example.com
+        password:
+          type: string
+          format: password
+          example: '123456'
+
+    UserResponse:
+      type: object
+      required: [id, username, email]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 4
+        username:
+          type: string
+          example: selim
+        email:
+          type: string
+          format: email
+          example: selim@example.com
+
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+          description: 'JWT, valid for 7 days. Send it as "Authorization: Bearer <token>".'
+        user:
+          $ref: '#/components/schemas/UserResponse'
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Human-readable message, shown to the user as is

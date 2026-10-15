@@ -19,6 +19,7 @@ import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
@@ -70,6 +71,9 @@ fun Application.module() {
         get("/") {
             call.respondText("Hello")
         }
+
+        // resources/openapi/documentation.yaml dosyasını /swagger adresinde etkileşimli sayfa olarak gösterir.
+        swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
 
         get("/db-check") {
             val userCount = DatabaseFactory.dataSource.connection.use { connection ->
