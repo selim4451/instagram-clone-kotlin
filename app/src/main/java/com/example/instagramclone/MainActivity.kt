@@ -17,7 +17,6 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        // Alt boşluğu vermiyoruz: BottomNavigationView gezinme çubuğu boşluğunu kendisi ekliyor.
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
@@ -30,16 +29,14 @@ class MainActivity : AppCompatActivity() {
                 R.id.navCreate -> CreateFragment()
                 R.id.navReels -> ReelsFragment()
                 R.id.navProfile -> ProfileFragment()
-                else -> HomeFragment() // navHome
+                else -> HomeFragment()
             }
             showFragment(fragment)
             true
         }
 
-        // Zaten açık olan sekmeye tekrar basılınca Fragment'ı baştan oluşturma.
         binding.bottomNav.setOnItemReselectedListener { }
 
-        // Ekran döndürmede Android Fragment'ı kendisi geri yükler; sadece ilk açılışta ekliyoruz.
         if (savedInstanceState == null) {
             showFragment(HomeFragment())
         }

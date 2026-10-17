@@ -4,14 +4,24 @@ import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.example.instagramclone.data.remote.dto.UserResponse
 import com.example.instagramclone.databinding.ActivityRegisterBinding
+import com.example.instagramclone.util.Resource
+import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
+
+    private val viewModel: RegisterViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,17 +36,45 @@ class RegisterActivity : AppCompatActivity() {
 
         binding.registerButton.setOnClickListener {
             if (validateForm()) {
-                Toast.makeText(this, R.string.register_form_ok, Toast.LENGTH_SHORT).show()
+                viewModel.register(
+                    username = binding.userNameInput.text.toString().trim(),
+                    email = binding.emailInput.text.toString().trim(),
+                    password = binding.passwordInput.text.toString(),
+                )
             }
         }
 
-        // Yeni Intent açmıyoruz: bu ekranı kapatınca alttaki Login zaten görünür.
         binding.loginLink.setOnClickListener {
             finish()
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state -> render(state) }
+            }
+        }
     }
 
-    // Form geçerliyse true döner; değilse ilgili alanın altına hata yazar.
+    private fun render(state: Resource<UserResponse>?) {
+        val isLoading = state is Resource.Loading
+        binding.progressIndicator.isVisible = isLoading
+        binding.registerButton.isEnabled = !isLoading
+
+        when (state) {
+            is Resource.Success -> {
+                Toast.makeText(this, R.string.register_success, Toast.LENGTH_LONG).show()
+                finish()
+            }
+            is Resource.Error -> {
+                val message = state.message ?: getString(
+                    if (state.isNetworkError) R.string.error_network else R.string.error_unexpected
+                )
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            }
+            Resource.Loading, null -> Unit
+        }
+    }
+
     private fun validateForm(): Boolean {
         val userName = binding.userNameInput.text.toString().trim()
         val email = binding.emailInput.text.toString().trim()
