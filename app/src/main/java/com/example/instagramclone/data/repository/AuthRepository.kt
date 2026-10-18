@@ -1,6 +1,7 @@
 package com.example.instagramclone.data.repository
 
 import android.util.Log
+import com.example.instagramclone.data.local.TokenStore
 import com.example.instagramclone.data.remote.ApiClient
 import com.example.instagramclone.data.remote.AuthApi
 import com.example.instagramclone.data.remote.dto.AuthResponse
@@ -19,13 +20,21 @@ class AuthRepository(private val api: AuthApi = ApiClient.authApi) {
         safeApiCall { api.register(RegisterRequest(username, email, password)) }
 
     suspend fun login(email: String, password: String): Resource<AuthResponse> =
-        safeApiCall { api.login(LoginRequest(email, password)) }
+        safeApiCall {
+            api.login(LoginRequest(email, password)).also { TokenStore.save(it.token) }
+        }
+
+    suspend fun me(): Resource<UserResponse> = safeApiCall { api.me() }
+
+    suspend fun isLoggedIn(): Boolean = TokenStore.getToken() != null
+
+    suspend fun logout() = TokenStore.clear()
 
     private suspend fun <T> safeApiCall(call: suspend () -> T): Resource<T> =
         try {
             Resource.Success(call())
         } catch (e: HttpException) {
-            Resource.Error(message = e.errorMessage())
+            Resource.Error(message = e.errorMessage(), httpCode = e.code())
         } catch (e: IOException) {
             Log.w(TAG, "Network error", e)
             Resource.Error(isNetworkError = true)

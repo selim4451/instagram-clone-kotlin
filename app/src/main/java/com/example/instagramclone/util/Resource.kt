@@ -7,5 +7,6 @@ sealed interface Resource<out T> {
     data class Error(
         val message: String? = null,
         val isNetworkError: Boolean = false,
+        val httpCode: Int? = null,
     ) : Resource<Nothing>
 }

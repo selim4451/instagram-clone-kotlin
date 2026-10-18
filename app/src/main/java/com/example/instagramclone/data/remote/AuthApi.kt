@@ -5,6 +5,7 @@ import com.example.instagramclone.data.remote.dto.LoginRequest
 import com.example.instagramclone.data.remote.dto.RegisterRequest
 import com.example.instagramclone.data.remote.dto.UserResponse
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface AuthApi {
@@ -14,4 +15,7 @@ interface AuthApi {
 
     @POST("login")
     suspend fun login(@Body body: LoginRequest): AuthResponse
+
+    @GET("me")
+    suspend fun me(): UserResponse
 }
