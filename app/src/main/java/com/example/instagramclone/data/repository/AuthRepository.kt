@@ -1,18 +1,14 @@
 package com.example.instagramclone.data.repository
 
-import android.util.Log
 import com.example.instagramclone.data.local.TokenStore
 import com.example.instagramclone.data.remote.ApiClient
 import com.example.instagramclone.data.remote.AuthApi
 import com.example.instagramclone.data.remote.dto.AuthResponse
-import com.example.instagramclone.data.remote.dto.ErrorResponse
 import com.example.instagramclone.data.remote.dto.LoginRequest
 import com.example.instagramclone.data.remote.dto.RegisterRequest
 import com.example.instagramclone.data.remote.dto.UserResponse
 import com.example.instagramclone.util.Resource
-import kotlinx.serialization.SerializationException
-import retrofit2.HttpException
-import java.io.IOException
+import com.example.instagramclone.util.safeApiCall
 
 class AuthRepository(private val api: AuthApi = ApiClient.authApi) {
 
@@ -29,25 +25,4 @@ class AuthRepository(private val api: AuthApi = ApiClient.authApi) {
     suspend fun isLoggedIn(): Boolean = TokenStore.getToken() != null
 
     suspend fun logout() = TokenStore.clear()
-
-    private suspend fun <T> safeApiCall(call: suspend () -> T): Resource<T> =
-        try {
-            Resource.Success(call())
-        } catch (e: HttpException) {
-            Resource.Error(message = e.errorMessage(), httpCode = e.code())
-        } catch (e: IOException) {
-            Log.w(TAG, "Network error", e)
-            Resource.Error(isNetworkError = true)
-        } catch (e: SerializationException) {
-            Resource.Error()
-        }
-
-    private fun HttpException.errorMessage(): String? =
-        response()?.errorBody()?.string()?.let { body ->
-            runCatching { ApiClient.json.decodeFromString<ErrorResponse>(body).error }.getOrNull()
-        }
-
-    private companion object {
-        const val TAG = "AuthRepository"
-    }
 }

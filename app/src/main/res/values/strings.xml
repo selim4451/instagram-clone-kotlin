@@ -34,5 +34,16 @@
     <string name="error_confirm_password_empty">Şifreyi tekrar gir</string>
     <string name="error_password_mismatch">Şifreler eşleşmiyor</string>
 
+    <string name="feed_empty">Henüz gönderi yok. İlk gönderiyi sen paylaş!</string>
+    <string name="time_just_now">Az önce</string>
+    <string name="post_image_description">Gönderi fotoğrafı</string>
+
+    <string name="create_title">Yeni gönderi</string>
+    <string name="create_pick_photo">Fotoğraf seçmek için dokun</string>
+    <string name="create_caption_hint">Açıklama yaz…</string>
+    <string name="create_share">Paylaş</string>
+    <string name="create_success">Gönderi paylaşıldı</string>
+    <string name="create_image_error">Fotoğraf okunamadı, başka bir fotoğraf dene</string>
+
     <string name="profile_logout">Profilden Çıkış</string>
 </resources>
