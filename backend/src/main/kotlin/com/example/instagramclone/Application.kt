@@ -2,11 +2,15 @@ package com.example.instagramclone
 
 import com.example.instagramclone.db.DatabaseFactory
 import com.example.instagramclone.dto.ErrorResponse
+import com.example.instagramclone.repositories.PostRepository
 import com.example.instagramclone.repositories.UserRepository
 import com.example.instagramclone.routes.JWT_AUTH
 import com.example.instagramclone.routes.authRoutes
+import com.example.instagramclone.routes.postRoutes
 import com.example.instagramclone.services.AuthService
+import com.example.instagramclone.services.PostService
 import com.example.instagramclone.services.TokenService
+import com.example.instagramclone.storage.ImageStorage
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
@@ -15,6 +19,7 @@ import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.engine.embeddedServer
+import io.ktor.server.http.content.staticFiles
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
@@ -24,6 +29,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import java.io.File
 
 fun main() {
     val port = System.getenv("PORT")?.toInt() ?: 8080
@@ -37,6 +43,8 @@ fun Application.module() {
         System.getenv("JWT_SECRET") ?: error("JWT_SECRET environment variable is not set")
     )
     val authService = AuthService(UserRepository(DatabaseFactory.dataSource), tokenService)
+    val imageStorage = ImageStorage(File(System.getenv("UPLOAD_DIR") ?: "uploads"))
+    val postService = PostService(PostRepository(DatabaseFactory.dataSource), imageStorage)
 
     install(ContentNegotiation) {
         json()
@@ -87,5 +95,8 @@ fun Application.module() {
         }
 
         authRoutes(authService)
+        postRoutes(postService, imageStorage)
+
+        staticFiles("/uploads", imageStorage.directory)
     }
 }

@@ -4,3 +4,4 @@
 *.iml
 .kotlin
 .env
+/uploads

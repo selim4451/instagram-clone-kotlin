@@ -11,6 +11,8 @@ servers:
 tags:
   - name: Auth
     description: Registration, login and the current session
+  - name: Posts
+    description: Photo posts and the chronological feed
 
 paths:
   /register:
@@ -101,6 +103,69 @@ paths:
               example:
                 error: Oturum geçersiz ya da süresi dolmuş
 
+  /posts:
+    get:
+      tags: [Posts]
+      summary: Get the feed (newest first, max 50)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Posts in chronological order, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponse'
+        '401':
+          description: Token is missing, invalid or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags: [Posts]
+      summary: Share a photo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [image]
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: JPEG, PNG or WEBP, at most 10 MB
+                caption:
+                  type: string
+                  maxLength: 2200
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Missing image, unsupported file type or caption too long
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Sadece JPEG, PNG veya WEBP yüklenebilir
+        '401':
+          description: Token is missing, invalid or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -166,6 +231,41 @@ components:
           description: 'JWT, valid for 7 days. Send it as "Authorization: Bearer <token>".'
         user:
           $ref: '#/components/schemas/UserResponse'
+
+    AuthorResponse:
+      type: object
+      required: [id, username]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 4
+        username:
+          type: string
+          example: selim
+
+    PostResponse:
+      type: object
+      required: [id, imageUrl, caption, createdAt, author]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        imageUrl:
+          type: string
+          description: Path relative to the server, e.g. /uploads/<uuid>.jpg. Publicly readable.
+          example: /uploads/1c40938b-8e4a-48a9-990b-eb928ce4d833.jpg
+        caption:
+          type: string
+          example: İlk gönderim 📸
+        createdAt:
+          type: integer
+          format: int64
+          description: Unix epoch milliseconds
+          example: 1792364659466
+        author:
+          $ref: '#/components/schemas/AuthorResponse'
 
     ErrorResponse:
       type: object

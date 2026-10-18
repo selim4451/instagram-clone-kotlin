@@ -5,8 +5,6 @@ import com.example.instagramclone.dto.RegisterRequest
 import com.example.instagramclone.services.AuthService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
-import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -27,8 +25,7 @@ fun Route.authRoutes(authService: AuthService) {
 
     authenticate(JWT_AUTH) {
         get("/me") {
-            val userId = call.principal<JWTPrincipal>()!!.subject!!.toLong()
-            call.respond(authService.getUser(userId))
+            call.respond(authService.getUser(call.userId()))
         }
     }
 }
