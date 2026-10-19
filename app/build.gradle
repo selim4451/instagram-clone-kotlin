@@ -33,6 +33,10 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     buildFeatures {
         viewBinding true
         buildConfig true
@@ -58,6 +62,7 @@ dependencies {
     implementation libs.coil
     implementation libs.coil.network.okhttp
     testImplementation libs.junit
+    testImplementation libs.kotlinx.coroutines.test
     androidTestImplementation libs.androidx.espresso.core
     androidTestImplementation libs.androidx.junit
 }
