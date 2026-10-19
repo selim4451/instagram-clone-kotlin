@@ -28,4 +28,14 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.13")
     implementation("com.zaxxer:HikariCP:7.1.0")
     implementation("at.favre.lib:bcrypt:0.10.2")
+
+    testImplementation(kotlin("test"))
+    testImplementation("io.ktor:ktor-server-test-host")
+    testImplementation("io.ktor:ktor-client-content-negotiation")
+    testImplementation("io.zonky.test:embedded-postgres:2.2.2")
+    testImplementation(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.11.0"))
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

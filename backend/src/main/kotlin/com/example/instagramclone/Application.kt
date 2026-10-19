@@ -30,6 +30,7 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import java.io.File
+import javax.sql.DataSource
 
 fun main() {
     val port = System.getenv("PORT")?.toInt() ?: 8080
@@ -38,13 +39,19 @@ fun main() {
 }
 
 fun Application.module() {
-    DatabaseFactory.init()
-    val tokenService = TokenService(
-        System.getenv("JWT_SECRET") ?: error("JWT_SECRET environment variable is not set")
+    configure(
+        dataSource = DatabaseFactory.createDataSource(),
+        jwtSecret = System.getenv("JWT_SECRET") ?: error("JWT_SECRET environment variable is not set"),
+        uploadDir = File(System.getenv("UPLOAD_DIR") ?: "uploads"),
     )
-    val authService = AuthService(UserRepository(DatabaseFactory.dataSource), tokenService)
-    val imageStorage = ImageStorage(File(System.getenv("UPLOAD_DIR") ?: "uploads"))
-    val postService = PostService(PostRepository(DatabaseFactory.dataSource), imageStorage)
+}
+
+fun Application.configure(dataSource: DataSource, jwtSecret: String, uploadDir: File) {
+    DatabaseFactory.createSchema(dataSource)
+    val tokenService = TokenService(jwtSecret)
+    val authService = AuthService(UserRepository(dataSource), tokenService)
+    val imageStorage = ImageStorage(uploadDir)
+    val postService = PostService(PostRepository(dataSource), imageStorage)
 
     install(ContentNegotiation) {
         json()
@@ -83,7 +90,7 @@ fun Application.module() {
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
 
         get("/db-check") {
-            val userCount = DatabaseFactory.dataSource.connection.use { connection ->
+            val userCount = dataSource.connection.use { connection ->
                 connection.prepareStatement("SELECT COUNT(*) FROM users").use { statement ->
                     statement.executeQuery().use { result ->
                         result.next()

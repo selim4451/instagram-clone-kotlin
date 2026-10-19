@@ -6,10 +6,7 @@ import javax.sql.DataSource
 
 object DatabaseFactory {
 
-    lateinit var dataSource: DataSource
-        private set
-
-    fun init() {
+    fun createDataSource(): DataSource {
         val config = HikariConfig().apply {
             jdbcUrl = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/instagram_clone"
             username = System.getenv("DB_USER") ?: "postgres"
@@ -17,11 +14,10 @@ object DatabaseFactory {
                 ?: error("DB_PASSWORD environment variable is not set")
             maximumPoolSize = 5
         }
-        dataSource = HikariDataSource(config)
-        createSchema()
+        return HikariDataSource(config)
     }
 
-    private fun createSchema() {
+    fun createSchema(dataSource: DataSource) {
         val sql = checkNotNull(javaClass.getResource("/schema.sql")) { "schema.sql not found" }.readText()
         dataSource.connection.use { connection ->
             connection.createStatement().use { it.execute(sql) }
