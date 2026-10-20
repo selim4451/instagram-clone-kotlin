@@ -33,7 +33,7 @@ fun Route.postRoutes(postService: PostService, imageStorage: ImageStorage) {
                         imageName = imageStorage.save(part.provider(), extension)
                     }
                 }
-                part.dispose()
+                part.release()
             }
 
             call.respond(HttpStatusCode.Created, postService.create(call.userId(), imageName, caption))
