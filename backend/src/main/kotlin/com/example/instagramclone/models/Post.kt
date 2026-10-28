@@ -9,4 +9,7 @@ data class Post(
     val imageName: String,
     val caption: String,
     val createdAt: Instant,
+    val likeCount: Int = 0,
+    val likedByMe: Boolean = false,
+    val commentCount: Int = 0,
 )

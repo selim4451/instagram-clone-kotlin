@@ -2,6 +2,8 @@ package com.example.instagramclone
 
 import com.example.instagramclone.db.DatabaseFactory
 import com.example.instagramclone.dto.ErrorResponse
+import com.example.instagramclone.repositories.CommentRepository
+import com.example.instagramclone.repositories.LikeRepository
 import com.example.instagramclone.repositories.PostRepository
 import com.example.instagramclone.repositories.UserRepository
 import com.example.instagramclone.routes.JWT_AUTH
@@ -51,7 +53,12 @@ fun Application.configure(dataSource: DataSource, jwtSecret: String, uploadDir: 
     val tokenService = TokenService(jwtSecret)
     val authService = AuthService(UserRepository(dataSource), tokenService)
     val imageStorage = ImageStorage(uploadDir)
-    val postService = PostService(PostRepository(dataSource), imageStorage)
+    val postService = PostService(
+        postRepository = PostRepository(dataSource),
+        likeRepository = LikeRepository(dataSource),
+        commentRepository = CommentRepository(dataSource),
+        imageStorage = imageStorage,
+    )
 
     install(ContentNegotiation) {
         json()
