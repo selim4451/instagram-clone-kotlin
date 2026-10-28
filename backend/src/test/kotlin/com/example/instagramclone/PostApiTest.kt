@@ -2,14 +2,9 @@ package com.example.instagramclone
 
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
-import io.ktor.client.request.forms.formData
-import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsBytes
 import io.ktor.http.ContentType
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.serialization.json.JsonArray
@@ -22,24 +17,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PostApiTest {
-
-    private suspend fun TestApp.createPost(
-        token: String,
-        caption: String? = "Merhaba",
-        image: ByteArray? = TEST_PNG,
-        imageType: String = "image/png",
-    ): HttpResponse = client.submitFormWithBinaryData(
-        url = "/posts",
-        formData = formData {
-            if (caption != null) append("caption", caption)
-            if (image != null) {
-                append("image", image, Headers.build {
-                    append(HttpHeaders.ContentType, imageType)
-                    append(HttpHeaders.ContentDisposition, "filename=\"photo\"")
-                })
-            }
-        },
-    ) { bearerAuth(token) }
 
     @Test
     fun `fotoğraflı gönderi oluşturunca 201 ve gönderi bilgisi döner`() = testApp {

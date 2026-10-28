@@ -3,21 +3,26 @@ package com.example.instagramclone
 import com.example.instagramclone.db.DatabaseFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
 import java.nio.file.Files
 import javax.sql.DataSource
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 object TestDatabase {
 
@@ -32,7 +37,7 @@ object TestDatabase {
 
     fun reset() {
         dataSource.connection.use { connection ->
-            connection.createStatement().use { it.execute("TRUNCATE users, posts RESTART IDENTITY CASCADE") }
+            connection.createStatement().use { it.execute("TRUNCATE users, posts, likes, comments RESTART IDENTITY CASCADE") }
         }
     }
 
@@ -88,6 +93,27 @@ suspend fun TestApp.registerAndLogin(
     register(username = username, email = email)
     return login(email = email).body<JsonObject>()["token"]!!.jsonPrimitive.content
 }
+
+suspend fun TestApp.createPost(
+    token: String,
+    caption: String? = "Merhaba",
+    image: ByteArray? = TEST_PNG,
+    imageType: String = "image/png",
+): HttpResponse = client.submitFormWithBinaryData(
+    url = "/posts",
+    formData = formData {
+        if (caption != null) append("caption", caption)
+        if (image != null) {
+            append("image", image, Headers.build {
+                append(HttpHeaders.ContentType, imageType)
+                append(HttpHeaders.ContentDisposition, "filename=\"photo\"")
+            })
+        }
+    },
+) { bearerAuth(token) }
+
+suspend fun TestApp.createPostId(token: String, caption: String = "Merhaba"): Long =
+    createPost(token, caption = caption).body<JsonObject>()["id"]!!.jsonPrimitive.content.toLong()
 
 suspend fun HttpResponse.errorMessage(): String = body<JsonObject>()["error"]!!.jsonPrimitive.content
 
