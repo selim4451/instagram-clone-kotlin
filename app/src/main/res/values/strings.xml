@@ -37,6 +37,26 @@
     <string name="feed_empty">Henüz gönderi yok. İlk gönderiyi sen paylaş!</string>
     <string name="time_just_now">Az önce</string>
     <string name="post_image_description">Gönderi fotoğrafı</string>
+    <string name="post_like">Beğen</string>
+    <string name="post_unlike">Beğeniyi geri al</string>
+    <string name="post_comment">Yorum yap</string>
+    <plurals name="post_like_count">
+        <item quantity="one">%d beğenme</item>
+        <item quantity="other">%d beğenme</item>
+    </plurals>
+    <plurals name="post_view_comments">
+        <item quantity="one">%d yorumu gör</item>
+        <item quantity="other">%d yorumun tümünü gör</item>
+    </plurals>
+
+    <string name="back">Geri</string>
+    <string name="cancel">Vazgeç</string>
+    <string name="comments_title">Yorumlar</string>
+    <string name="comments_empty">Henüz yorum yok. İlk yorumu sen yaz!</string>
+    <string name="comments_hint">Yorum ekle…</string>
+    <string name="comments_send">Paylaş</string>
+    <string name="comments_delete_title">Yorum silinsin mi?</string>
+    <string name="comments_delete">Sil</string>
 
     <string name="create_title">Yeni gönderi</string>
     <string name="create_pick_photo">Fotoğraf seçmek için dokun</string>

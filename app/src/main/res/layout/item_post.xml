@@ -45,16 +45,75 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/avatarImage" />
 
+    <ImageView
+        android:id="@+id/doubleTapHeart"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:alpha="0"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_favorite"
+        app:layout_constraintBottom_toBottomOf="@id/postImage"
+        app:layout_constraintEnd_toEndOf="@id/postImage"
+        app:layout_constraintStart_toStartOf="@id/postImage"
+        app:layout_constraintTop_toTopOf="@id/postImage"
+        app:tint="@android:color/white" />
+
+    <ImageButton
+        android:id="@+id/likeButton"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/post_like"
+        android:src="@drawable/ic_favorite_border"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/postImage" />
+
+    <ImageButton
+        android:id="@+id/commentButton"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/post_comment"
+        android:src="@drawable/ic_comment"
+        app:layout_constraintStart_toEndOf="@id/likeButton"
+        app:layout_constraintTop_toTopOf="@id/likeButton" />
+
+    <TextView
+        android:id="@+id/likeCountText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/likeButton"
+        tools:text="12 beğenme" />
+
     <TextView
         android:id="@+id/captionText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="12dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/postImage"
+        app:layout_constraintTop_toBottomOf="@id/likeCountText"
         tools:text="selim Merhaba dünya" />
+
+    <TextView
+        android:id="@+id/viewCommentsText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="4dp"
+        android:background="?attr/selectableItemBackground"
+        android:textColor="?android:attr/textColorSecondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/captionText"
+        tools:text="3 yorumun tümünü gör" />
 
     <TextView
         android:id="@+id/timeText"
@@ -66,6 +125,6 @@
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/captionText"
+        app:layout_constraintTop_toBottomOf="@id/viewCommentsText"
         tools:text="2 saat önce" />
 </androidx.constraintlayout.widget.ConstraintLayout>

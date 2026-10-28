@@ -23,6 +23,8 @@ class HomeViewModel(
     private val _error = MutableStateFlow<Resource.Error?>(null)
     val error: StateFlow<Resource.Error?> = _error.asStateFlow()
 
+    private val pendingLikes = mutableSetOf<Long>()
+
     init {
         refresh()
     }
@@ -40,7 +42,45 @@ class HomeViewModel(
         }
     }
 
+    fun toggleLike(postId: Long) {
+        val original = findPost(postId) ?: return
+        if (!pendingLikes.add(postId)) return
+
+        val liked = !original.likedByMe
+        updatePost(postId) {
+            it.copy(likedByMe = liked, likeCount = it.likeCount + if (liked) 1 else -1)
+        }
+
+        viewModelScope.launch {
+            when (val result = repository.setLiked(postId, liked)) {
+                is Resource.Success -> updatePost(postId) {
+                    it.copy(likedByMe = result.data.likedByMe, likeCount = result.data.likeCount)
+                }
+                is Resource.Error -> {
+                    updatePost(postId) {
+                        it.copy(likedByMe = original.likedByMe, likeCount = original.likeCount)
+                    }
+                    _error.value = result
+                }
+                Resource.Loading -> Unit
+            }
+            pendingLikes.remove(postId)
+        }
+    }
+
+    fun likeFromDoubleTap(postId: Long) {
+        if (findPost(postId)?.likedByMe == false) toggleLike(postId)
+    }
+
     fun errorShown() {
         _error.value = null
+    }
+
+    private fun findPost(postId: Long): PostResponse? =
+        (_feed.value as? Resource.Success)?.data?.firstOrNull { it.id == postId }
+
+    private fun updatePost(postId: Long, transform: (PostResponse) -> PostResponse) {
+        val posts = (_feed.value as? Resource.Success)?.data ?: return
+        _feed.value = Resource.Success(posts.map { if (it.id == postId) transform(it) else it })
     }
 }
